@@ -1,31 +1,38 @@
-from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
+from urllib.parse import quote
+from sqlalchemy import create_engine
 
 
-def get_engine(user: str, password: str, host: str, port: str, db: str):
-
-    database_url = f"postgresql://{user}:{password}@{host}:{port}/{db}"
-
-    if not database_exists(database_url):
-        print("nie ma DB")
-        create_database(database_url)
-    print("jest DB")
-    engine = create_engine(database_url)
-
-    return engine
+USER = "postgres"
+PASSWORD = "password"
+HOST = "localhost"
+PORT = "5432"
+DB_NAME = "employee_manager_db"
 
 
-db_engine = get_engine(
-    "postgres", "password", "localhost", "5432", "employee_manager_db"
+SYNC_DATABASE_URL = f"postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}"
+ASYNC_DATABASE_URL = f"postgresql+asyncpg://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}"
+
+
+def init_database():
+    sync_engine = create_engine(SYNC_DATABASE_URL)
+    if not database_exists(sync_engine.url):
+        create_database(sync_engine.url)
+
+
+init_database()
+
+sync_engine = create_engine(SYNC_DATABASE_URL)
+async_engine = create_async_engine(ASYNC_DATABASE_URL)
+
+
+SesionLocal = sessionmaker(
+    bind=async_engine, class_=AsyncSession, expire_on_commit=False
 )
 
-SessionLocal = sessionmaker(bind=db_engine)
 
-
-def get_db():
-    session = SessionLocal()
-    try:
+async def get_db():
+    async with SesionLocal() as session:
         yield session
-    finally:
-        session.close()

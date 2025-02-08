@@ -1,5 +1,10 @@
 from http.client import HTTPException
 
+from sqlalchemy import and_
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+
 from database_structure.models import WorkSchedule
 from employee.services.exceptions import (
     ResourceDoesNotExistException,
@@ -17,13 +22,20 @@ class ScheduleManager:
 
 class CreateSchedule:
     async def create_schedule(
-        self, employee_id: str, full_name: str, day: str, availability: str, db
+        self,
+        employee_id: str,
+        full_name: str,
+        day: str,
+        availability: str,
+        db: AsyncSession,
     ):
-        instance = (
-            db.query(WorkSchedule).filter_by(employee_id=employee_id, day=day).first()
-        )
 
-        if instance:
+        stmt = select(WorkSchedule).where(
+            (WorkSchedule.employee_id == employee_id) & (WorkSchedule.day == day)
+        )
+        instance = await db.execute(stmt)
+
+        if instance.scalars().first():
             raise ResourceAlreadyExistException(
                 resource_name="schedule",
                 unit="day & employee",
@@ -38,9 +50,10 @@ class CreateSchedule:
         )
         try:
             db.add(new_schedule)
-            db.commit()
-        except Exception as e:
-            db.rollback()
+            await db.commit()
+            await db.refresh(new_schedule)
+        except SQLAlchemyError as e:
+            await db.rollback()
             raise HTTPException(
                 status_code=500,
                 detail=f"Error occurred while creating schedule: {str(e)}",
@@ -49,42 +62,50 @@ class CreateSchedule:
 
 
 class ReadSchedule:
-    async def list_schedules(self, db):
-        return db.query(WorkSchedule).all()
+    async def list_schedules(self, db: AsyncSession):
+        stmt = select(WorkSchedule)
+        result = await db.execute(stmt)
+        return result.scalars().all()
 
-    async def get_schedules_by_date_range(self, start: str, end: str, db):
-        return (
-            db.query(WorkSchedule)
-            .filter(WorkSchedule.day >= start, WorkSchedule.day <= end)
-            .all()
+    async def get_schedules_by_date_range(self, start: str, end: str, db: AsyncSession):
+        stmt = select(WorkSchedule).where(WorkSchedule.day.between(start, end))
+        result = await db.execute(stmt)
+        return result.scalars().all()
+
+    async def get_schedules_by_specific_day(self, day, db: AsyncSession):
+        stmt = select(WorkSchedule).where(WorkSchedule.day == day)
+        result = await db.execute(stmt)
+        return result.scalars().all()
+
+    async def get_schedules_by_employee(self, employee_id, db: AsyncSession):
+        stmt = select(WorkSchedule).where(WorkSchedule.employee_id == employee_id)
+        result = await db.execute(stmt)
+        return result.scalars().all()
+
+    async def get_schedule_by_employee_and_specific_day(
+        self, employee_id, day, db: AsyncSession
+    ):
+        stmt = select(WorkSchedule).where(
+            and_(WorkSchedule.employee_id == employee_id, WorkSchedule.day == day)
         )
-
-    async def get_schedules_by_specific_day(self, day, db):
-        return db.query(WorkSchedule).filter(WorkSchedule.day == day).all()
-
-    async def get_schedules_by_employee(self, employee_id, db):
-        return (
-            db.query(WorkSchedule).filter(WorkSchedule.employee_id == employee_id).all()
-        )
-
-    async def get_schedule_by_employee_and_specific_day(self, employee_id, day, db):
-        return (
-            db.query(WorkSchedule)
-            .filter(WorkSchedule.employee_id == employee_id, WorkSchedule.day == day)
-            .first()
-        )
+        result = await db.execute(stmt)
+        return result.scalars().first()
 
 
 class UpdateSchedule:
     async def update_availability(
-        self, employee_id: str, schedule_id: int, new_availability: str, db
+        self,
+        employee_id: str,
+        schedule_id: int,
+        new_availability: str,
+        db: AsyncSession,
     ):
-        schedule = (
-            db.query(WorkSchedule)
-            .filter_by(employee_id=employee_id, id=schedule_id)
-            .first()
+        stmt = select(WorkSchedule).where(
+            (WorkSchedule.employee_id == employee_id) & (WorkSchedule.id == schedule_id)
         )
 
+        result = await db.execute(stmt)
+        schedule = result.scalars().first()
         if not schedule:
             raise ResourceDoesNotExistException(
                 resource_name="schedule",
@@ -93,18 +114,22 @@ class UpdateSchedule:
             )
 
         schedule.availability = new_availability
-        db.commit()
+        await db.commit()
+        await db.refresh(schedule)
 
         return schedule
 
 
 class DeleteSchedule:
-    async def delete_schedule(self, employee_id: str, schedule_id: int, db):
-        schedule = (
-            db.query(WorkSchedule)
-            .filter_by(employee_id=employee_id, id=schedule_id)
-            .first()
+    async def delete_schedule(
+        self, employee_id: str, schedule_id: int, db: AsyncSession
+    ):
+
+        stmt = select(WorkSchedule).where(
+            (WorkSchedule.employee_id == employee_id) & (WorkSchedule.id == schedule_id)
         )
+        result = await db.execute(stmt)
+        schedule = result.scalars().first()
 
         if not schedule:
             raise ResourceDoesNotExistException(
@@ -112,7 +137,7 @@ class DeleteSchedule:
                 unit="ID",
                 identification_mark=str(schedule_id),
             )
-        db.delete(schedule)
-        db.commit()
+        await db.delete(schedule)
+        await db.commit()
 
         return schedule

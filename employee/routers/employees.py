@@ -3,7 +3,10 @@ from datetime import datetime
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 
-from database_structure.database import get_db, SessionLocal
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
+from database_structure.database import get_db  # , AsyncSession
 from employee.schemas import (
     CreateScheduleRequest,
     UpdateScheduleRequest,
@@ -25,25 +28,27 @@ async def validate_date(date_str: str):
 
 @router.post("/schedule")
 async def create_schedule(
-    schedule_request: CreateScheduleRequest, db: SessionLocal = Depends(get_db)
+    schedule_request: CreateScheduleRequest, db: AsyncSession = Depends(get_db)
 ):
+    day = await validate_date(schedule_request.day)
+
     return await ScheduleManagerObj.create.create_schedule(
         schedule_request.employee_id,
         schedule_request.full_name,
-        schedule_request.day,
+        day,
         schedule_request.availability,
         db,
     )
 
 
 @router.get("/schedules")
-async def list_schedules(db: SessionLocal = Depends(get_db)):
+async def list_schedules(db: AsyncSession = Depends(get_db)):
     return await ScheduleManagerObj.read.list_schedules(db)
 
 
 @router.get("/schedules/start_date/{start}/end_date/{end}")
 async def get_schedules_by_date_range(
-    start: str, end: str, db: SessionLocal = Depends(get_db)
+    start: str, end: str, db: AsyncSession = Depends(get_db)
 ):
     start_date = await validate_date(start)
     end_date = await validate_date(end)
@@ -53,21 +58,24 @@ async def get_schedules_by_date_range(
 
 
 @router.get("/schedules/day/{day}")
-async def get_schedules_by_day(day: str, db: SessionLocal = Depends(get_db)):
+async def get_schedules_by_day(day: str, db: AsyncSession = Depends(get_db)):
+    day = await validate_date(day)
+
     return await ScheduleManagerObj.read.get_schedules_by_specific_day(day, db)
 
 
 @router.get("/schedules/employee/{employee_id}")
 async def get_schedules_by_specific_employee(
-    employee_id: str, db: SessionLocal = Depends(get_db)
+    employee_id: str, db: AsyncSession = Depends(get_db)
 ):
     return await ScheduleManagerObj.read.get_schedules_by_employee(employee_id, db)
 
 
 @router.get("/schedule/employee/{employee_id}/day/{day}")
 async def get_schedule_by_specific_employee_and_specific_day(
-    employee_id: str, day: str, db: SessionLocal = Depends(get_db)
+    employee_id: str, day: str, db: AsyncSession = Depends(get_db)
 ):
+    day = await validate_date(day)
     return await ScheduleManagerObj.read.get_schedule_by_employee_and_specific_day(
         employee_id, day, db
     )
@@ -75,7 +83,7 @@ async def get_schedule_by_specific_employee_and_specific_day(
 
 @router.patch("/schedule")
 async def update_schedule(
-    schedule_request: UpdateScheduleRequest, db: SessionLocal = Depends(get_db)
+    schedule_request: UpdateScheduleRequest, db: AsyncSession = Depends(get_db)
 ):
     return await ScheduleManagerObj.update.update_availability(
         schedule_request.employee_id,
@@ -87,7 +95,7 @@ async def update_schedule(
 
 @router.delete("/schedule")
 async def delete_schedule(
-    schedule_request: DeleteScheduleRequest, db: SessionLocal = Depends(get_db)
+    schedule_request: DeleteScheduleRequest, db: AsyncSession = Depends(get_db)
 ):
     return await ScheduleManagerObj.delete.delete_schedule(
         schedule_request.employee_id, schedule_request.schedule_id, db
