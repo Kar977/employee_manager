@@ -1,15 +1,14 @@
 from http.client import HTTPException
 
-from sqlalchemy import and_
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-
 from database_structure.models import WorkSchedule
 from employee.services.exceptions import (
     ResourceDoesNotExistException,
     ResourceAlreadyExistException,
 )
+from sqlalchemy import and_
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 
 class ScheduleManager:

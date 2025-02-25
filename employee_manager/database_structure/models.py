@@ -1,7 +1,6 @@
+from database_structure.database import sync_engine as db_engine
 from sqlalchemy import Column, Integer, String, Date
 from sqlalchemy.orm import declarative_base, validates
-
-from database_structure.database import sync_engine as db_engine
 
 Base = declarative_base()
 

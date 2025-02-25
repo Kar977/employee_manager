@@ -1,11 +1,5 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends
-from fastapi.exceptions import HTTPException
-
-from sqlalchemy.ext.asyncio import AsyncSession
-
-
 from database_structure.database import get_db  # , AsyncSession
 from employee.schemas import (
     CreateScheduleRequest,
@@ -13,6 +7,9 @@ from employee.schemas import (
     DeleteScheduleRequest,
 )
 from employee.services.employees import ScheduleManager
+from fastapi import APIRouter, Depends
+from fastapi.exceptions import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/employee")
 
@@ -46,7 +43,7 @@ async def list_schedules(db: AsyncSession = Depends(get_db)):
     return await ScheduleManagerObj.read.list_schedules(db)
 
 
-@router.get("/schedules/start_date/{start}/end_date/{end}")
+@router.get("/schedules/start-date/{start}/end-date/{end}")
 async def get_schedules_by_date_range(
     start: str, end: str, db: AsyncSession = Depends(get_db)
 ):
