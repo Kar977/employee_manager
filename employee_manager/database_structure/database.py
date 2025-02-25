@@ -1,15 +1,19 @@
+import os
+
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
-from urllib.parse import quote
-from sqlalchemy import create_engine
+
+load_dotenv("../docker/.env")
 
 
-USER = "postgres"
-PASSWORD = "password"
-HOST = "localhost"
-PORT = "5432"
-DB_NAME = "employee_manager_db"
+USER = os.getenv("POSTGRES_USER")
+PASSWORD = os.getenv("POSTGRES_PASSWORD")
+HOST = os.getenv("POSTGRES_HOST")
+PORT = os.getenv("POSTGRES_PORT")
+DB_NAME = os.getenv("POSTGRES_NAME")
 
 
 SYNC_DATABASE_URL = f"postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}"
