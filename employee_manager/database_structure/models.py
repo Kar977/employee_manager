@@ -1,8 +1,9 @@
-from database_structure.database import sync_engine as db_engine
 from sqlalchemy import Column, Integer, String, Date
-from sqlalchemy.orm import declarative_base, validates
+from sqlalchemy.orm import validates, DeclarativeBase
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
 
 VALID_HOURS_RANGE = (
     "07:00-15:00",
@@ -32,6 +33,3 @@ class WorkSchedule(Base):
                 f"Invalid availability range - {availability}. Must be one of {VALID_HOURS_RANGE}"
             )
         return availability
-
-
-Base.metadata.create_all(bind=db_engine)

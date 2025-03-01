@@ -1,36 +1,11 @@
-import os
-
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from database_structure.models import Base
+from settings import settings
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import database_exists, create_database
 
-load_dotenv("../docker/.env")
+ASYNC_DATABASE_URL = f"postgresql+asyncpg://{settings.postgres_user}:{settings.postgres_password}@{settings.postgres_host}:{settings.postgres_port}/{settings.postgres_name}"
 
-
-USER = os.getenv("POSTGRES_USER")
-PASSWORD = os.getenv("POSTGRES_PASSWORD")
-HOST = os.getenv("POSTGRES_HOST")
-PORT = os.getenv("POSTGRES_PORT")
-DB_NAME = os.getenv("POSTGRES_NAME")
-
-
-SYNC_DATABASE_URL = f"postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}"
-ASYNC_DATABASE_URL = f"postgresql+asyncpg://{USER}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}"
-
-
-def init_database():
-    sync_engine = create_engine(SYNC_DATABASE_URL)
-    if not database_exists(sync_engine.url):
-        create_database(sync_engine.url)
-
-
-init_database()
-
-sync_engine = create_engine(SYNC_DATABASE_URL)
 async_engine = create_async_engine(ASYNC_DATABASE_URL)
-
 
 SesionLocal = sessionmaker(
     bind=async_engine, class_=AsyncSession, expire_on_commit=False
@@ -40,3 +15,7 @@ SesionLocal = sessionmaker(
 async def get_db():
     async with SesionLocal() as session:
         yield session
+
+async def init_db():
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
