@@ -1,5 +1,5 @@
 services:
-  db:
+  employee-db:
     image: postgres:15
     restart: always
     env_file:
@@ -7,22 +7,35 @@ services:
     environment:
       POSTGRES_DB: ${POSTGRES_NAME}
       POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD} #ToDo zrobic tak samo dla zmiennych srodowiskowych dla web
     volumes:
       - postgres_data_employee:/var/lib/postgresql/data
-  web:
+    networks:
+      - service_employee_network
+  employee-service:
     build:
       context: ../
       dockerfile: docker/Dockerfile
     restart: always
     depends_on:
-      - db
+      - employee-db
     env_file:
       - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_NAME: ${POSTGRES_NAME}
     volumes:
       - ../employee_manager:/app
     ports:
       - "8003:8003"
+    networks:
+      - service_employee_network
 volumes:
   postgres_data_employee:
+networks:
+  service_employee_network:
+    external: true
 
