@@ -1,12 +1,12 @@
 from datetime import datetime
 
-from database_structure.database import get_db  # , AsyncSession
-from employee.schemas import (
+from employee_manager.database_structure.database import get_db  # , AsyncSession
+from employee_manager.employee.schemas import (
     CreateScheduleRequest,
     UpdateScheduleRequest,
     DeleteScheduleRequest,
 )
-from employee.services.employees import ScheduleManager
+from employee_manager.employee.services.employees import ScheduleManager
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession

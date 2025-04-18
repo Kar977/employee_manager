@@ -1,7 +1,7 @@
 from http.client import HTTPException
 
-from database_structure.models import WorkSchedule
-from employee.services.exceptions import (
+from employee_manager.database_structure.models import WorkSchedule
+from employee_manager.employee.services.exceptions import (
     ResourceDoesNotExistException,
     ResourceAlreadyExistException,
 )
@@ -136,6 +136,7 @@ class DeleteSchedule:
                 unit="ID",
                 identification_mark=str(schedule_id),
             )
+
         await db.delete(schedule)
         await db.commit()
 
