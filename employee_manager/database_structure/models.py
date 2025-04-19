@@ -5,6 +5,7 @@ from sqlalchemy.orm import validates, DeclarativeBase
 class Base(DeclarativeBase):
     pass
 
+
 VALID_HOURS_RANGE = (
     "07:00-15:00",
     "08:00-16:00",
