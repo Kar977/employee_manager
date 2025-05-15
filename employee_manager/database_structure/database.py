@@ -1,5 +1,5 @@
-from employee_manager.database_structure.models import Base
-from employee_manager.settings import settings
+from database_structure.models import Base
+from settings import settings
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 

@@ -1,8 +1,8 @@
 from unittest.mock import AsyncMock, MagicMock
 import pytest
-from employee_manager.database_structure.database import get_db
-from employee_manager.database_structure.models import WorkSchedule
-from employee_manager.main import app
+from database_structure.database import get_db
+from database_structure.models import WorkSchedule
+from main import app
 from datetime import date
 
 mock_session = AsyncMock()
