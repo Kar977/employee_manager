@@ -37,10 +37,14 @@ jobs:
           pwd
           docker-compose up -d --build
 
+          
+
       - name: Wait for services to start
         run: |
           echo "Waiting for services to become healthy..."
           sleep 20
+          docker logs docker_employee-db_1
+          
           docker ps -a
 
       - name: Check if API Gateway is running
