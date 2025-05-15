@@ -33,7 +33,8 @@ jobs:
       - name: Build and start containers
         working-directory: docker
         run: |  
-          cd docker
+          echo "Current working directory:"
+          pwd
           docker-compose up -d --build
 
       - name: Wait for services to start
