@@ -28,7 +28,7 @@ jobs:
 
       - name: Write .env file from GitHub Secret
         run: |
-          echo "${{ secrets.GATEWAY_ENV_FILE }}" > docker/.env
+          echo "${{ secrets.GATEWAY_ENV_FILE }}" > .env
 
       - name: Build and start containers
         working-directory: docker
