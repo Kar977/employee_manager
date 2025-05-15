@@ -26,6 +26,10 @@ jobs:
         run: |
           docker network create service_employee_network || true
 
+      - name: Write .env file from GitHub Secret
+        run: |
+          echo "${{ secrets.GATEWAY_ENV_FILE }}" > docker/.env
+
       - name: Build and start containers
         working-directory: docker
         run: docker-compose up -d --build
@@ -38,7 +42,7 @@ jobs:
 
       - name: Check if API Gateway is running
         run: |
-          curl --fail http://localhost:8003/schedules || (echo "Employee manager not responding" && exit 1)
+          curl --fail http://localhost:8003/employee/schedules || (echo "Employee manager not responding" && exit 1)
 
       - name: Tear down containers and networks
         if: always()
