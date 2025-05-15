@@ -27,6 +27,10 @@ jobs:
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         cd ..
+    - name: Write .env file from GitHub Secret
+      run: |
+        echo "${{ secrets.EMPLOYEE_ENV_FILE }}" > docker/.env
+    
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
