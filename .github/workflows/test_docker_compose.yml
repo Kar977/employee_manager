@@ -30,6 +30,7 @@ jobs:
         run: |
           echo "${{ secrets.GATEWAY_ENV_FILE }}" > .env
           echo "${{ secrets.GATEWAY_ENV_FILE }}" > docker/.env
+          echo "${{ secrets.GATEWAY_ENV_FILE }}" > employee_manager/.env
 
       - name: Build and start containers
         working-directory: docker
