@@ -1,7 +1,7 @@
 from http.client import HTTPException
 
-from employee_manager.database_structure.models import WorkSchedule
-from employee_manager.employee.services.exceptions import (
+from database_structure.models import WorkSchedule
+from employee.services.exceptions import (
     ResourceDoesNotExistException,
     ResourceAlreadyExistException,
 )

@@ -1,14 +1,15 @@
-from pydantic_settings import BaseSettings
-
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pathlib import Path
 from pydantic import Field, model_validator
 
 
 class Settings(BaseSettings):
-    postgres_user: str = Field(default="postgres")
-    postgres_password: str = Field(default="password")
-    postgres_host: str = Field(default="employee-db")
-    postgres_port: str = Field(default="5432")
-    postgres_name: str = Field(default="postgres_employee")
+    model_config = SettingsConfigDict(env_file=Path(__file__).parent / ".env")
+    postgres_user: str = Field()
+    postgres_password: str = Field()
+    postgres_host: str = Field()
+    postgres_port: str = Field()
+    postgres_name: str = Field()
     ASYNC_DATABASE_URL: str = (
         f"postgresql+asyncpg://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_name}"
     )
