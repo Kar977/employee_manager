@@ -32,7 +32,9 @@ jobs:
 
       - name: Build and start containers
         working-directory: docker
-        run: docker-compose up -d --build
+        run: |  
+          cd docker
+          docker-compose up -d --build
 
       - name: Wait for services to start
         run: |
