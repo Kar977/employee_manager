@@ -29,13 +29,11 @@ jobs:
         cd ..
     - name: Write .env file from GitHub Secret
       run: |
-        cat <<EOF > docker/.env
-    ${{ secrets.EMPLOYEE_ENV_FILE }}
-    EOF
+        printf "%s" "${{ secrets.GATEWAY_ENV_FILE }}" > docker/.env
     - name: Debug .env
-  run: |
-    echo "--- docker/.env ---"
-    cat docker/.env
+      run: |
+        echo "--- docker/.env ---"
+        cat docker/.env
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
