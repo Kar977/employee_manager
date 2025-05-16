@@ -4,7 +4,7 @@ from pydantic import Field, model_validator
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=Path(__file__).resolve().parent.parent / "docker" / ".env") #.parent / ".env")
+    model_config = SettingsConfigDict(env_file=Path(__file__).resolve().parent /".env") #.parent / ".env")
     postgres_user: str = Field()
     postgres_password: str = Field()
     postgres_host: str = Field()
