@@ -29,7 +29,7 @@ jobs:
         cd ..
     - name: Write .env file from GitHub Secret
       run: |
-        printf "%s" "${{ secrets.GATEWAY_ENV_FILE }}" > docker/.env
+        printf "%s" "${{ secrets.EMPLOYEE_ENV_FILE }}" > employee_manager/.env
     - name: Debug .env
       run: |
         echo "--- docker/.env ---"
