@@ -29,7 +29,9 @@ jobs:
         cd ..
     - name: Write .env file from GitHub Secret
       run: |
-        echo "${{ secrets.EMPLOYEE_ENV_FILE }}" > docker/.env
+        ls
+        cat <<EOF > employee_manager/.env ${{ secrets.GATEWAY_ENV_FILE }} EOF
+        ls
     
     - name: Lint with flake8
       run: |
