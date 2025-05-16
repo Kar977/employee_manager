@@ -32,8 +32,8 @@ jobs:
         printf "%s" "${{ secrets.EMPLOYEE_ENV_FILE }}" > employee_manager/.env
     - name: Debug .env
       run: |
-        echo "--- docker/.env ---"
-        cat docker/.env
+        echo "--- employee_manager/.env ---"
+        cat employee_manager/.env
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
