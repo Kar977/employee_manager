@@ -28,8 +28,11 @@ jobs:
 
       - name: Write .env file from GitHub Secret
         run: |
-          cat <<EOF > docker/.env ${{ secrets.GATEWAY_ENV_FILE }} EOF
-          cat <<EOF > employee_manager/.env ${{ secrets.GATEWAY_ENV_FILE }} EOF
+          printf "%s" "${{ secrets.EMPLOYEE_ENV_FILE }}" > employee_manager/.env
+      - name: Debug .env
+        run: |
+          echo "--- employee_manager/.env ---"
+          cat employee_manager/.env
     
       - name: Build and start containers
         working-directory: docker
