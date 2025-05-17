@@ -25,6 +25,11 @@ jobs:
       - name: Create external Docker networks
         run: |
           docker network create service_employee_network || true
+          
+      - name: Find .env file before creating .env
+        run: |
+          echo "Szukam pliku .env..."
+          find . -name ".env" -print
 
       - name: Write .env file from GitHub Secret
         run: |
@@ -34,6 +39,10 @@ jobs:
         run: |
           echo "--- employee_manager/.env ---"
           cat employee_manager/.env
+      - name: Find .env file after creating
+        run: |
+          echo "Szukam pliku .env..."
+          find . -name ".env" -print
     
       - name: Build and start containers
         working-directory: docker
