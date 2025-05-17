@@ -4,15 +4,16 @@ from pydantic import Field, model_validator
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=Path(__file__).resolve().parent.parent / "docker" / ".env") #.parent / ".env")
+    #model_config = SettingsConfigDict(env_file=Path(__file__).resolve().parent /".env") #.parent / ".env")
+    model_config = SettingsConfigDict(env_file=Path(__file__).parent / ".env")
     postgres_user: str = Field()
     postgres_password: str = Field()
     postgres_host: str = Field()
     postgres_port: str = Field()
     postgres_name: str = Field()
-    ASYNC_DATABASE_URL: str = (
-        f"postgresql+asyncpg://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_name}"
-    )
+    ASYNC_DATABASE_URL: str = ""
+    #( f"postgresql+asyncpg://{postgres_user}:{postgres_password}@{postgres_host}:{postgres_port}/{postgres_name}"
+    #)
 
     @model_validator(mode="after")
     def db_url(self):
