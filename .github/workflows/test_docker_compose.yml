@@ -28,6 +28,7 @@ jobs:
 
       - name: Write .env file from GitHub Secret
         run: |
+          echo "Current working directory:" pwd
           printf "%s" "${{ secrets.EMPLOYEE_ENV_FILE }}" > employee_manager/.env
       - name: Debug .env
         run: |
