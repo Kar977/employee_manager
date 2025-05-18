@@ -33,32 +33,17 @@ jobs:
         run: |
           docker network create service_employee_network || true
           
-      - name: Find .env file before creating .env
-        run: |
-          echo "Szukam pliku .env..."
-          find . -name ".env" -print
-
       - name: Write .env file from GitHub Secret
         run: |
           mkdir -p employee_manager/employee_manager
           printf "%s" "${{ secrets.EMPLOYEE_ENV_FILE }}" > employee_manager/.env
-      - name: Debug .env
-        run: |
-          echo "--- employee_manager/.env ---"
-          cat employee_manager/.env
-      - name: Find .env file after creating
-        run: |
-          echo "Szukam pliku .env..."
-          find . -name ".env" -print
-    
+
       - name: Build and start containers
         working-directory: docker
         run: |  
           echo "Current working directory:"
           pwd
           docker-compose up -d --build
-
-          
 
       - name: Wait for services to start
         run: |
